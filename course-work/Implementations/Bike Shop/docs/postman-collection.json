@@ -1,0 +1,646 @@
+{
+  "info": {
+    "_postman_id": "bike-shop-api",
+    "name": "Bike Shop REST API",
+    "description": "Collection for testing Bike Shop REST API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Bikes",
+      "item": [
+        {
+          "name": "List All Bikes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/bikes?page=1&pageSize=10&search=&category=&available=",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "available",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Bike by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/bikes/a02dM00000YaPY1QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes",
+                "a02dM00000YaPY1QAN"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Bike",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Road Bike Pro\",\n  \"model\": \"RB-2024\",\n  \"brand\": \"Giant\",\n  \"category\": \"Road\",\n  \"dailyRate\": 35.00,\n  \"available\": true,\n  \"mileage\": 0\n}"
+            },
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/bikes",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Bike",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dailyRate\": 40.00,\n  \"mileage\": 500,\n  \"available\": false\n}"
+            },
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/bikes/a02dM00000YaPY1QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes",
+                "a02dM00000YaPY1QAN"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Bike",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/bikes/a02dM00000YaPY1QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes",
+                "a02dM00000YaPY1QAN"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "List All Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/customers?page=1&pageSize=10&search=&isActive=",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/customers/a03dM00000YaPY2QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers",
+                "a03dM00000YaPY2QAN"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"0888123456\",\n  \"birthDate\": \"1990-05-15\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/customers",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"0888999999\",\n  \"loyaltyPoints\": 50\n}"
+            },
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/customers/a03dM00000YaPY2QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers",
+                "a03dM00000YaPY2QAN"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/customers/a03dM00000YaPY2QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers",
+                "a03dM00000YaPY2QAN"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rentals",
+      "item": [
+        {
+          "name": "List All Rentals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/rentals?page=1&pageSize=10&status=&paid=",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "paid",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Rental by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/rentals/a04dM00000YaPY3QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals",
+                "a04dM00000YaPY3QAN"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Rental",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bikeId\": \"a02dM00000YaPY1QAN\",\n  \"customerId\": \"a03dM00000YaPY2QAN\",\n  \"startDate\": \"2026-03-10\",\n  \"endDate\": \"2026-03-15\",\n  \"status\": \"Active\",\n  \"paid\": false\n}"
+            },
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/rentals",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Rental",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Completed\",\n  \"paid\": true\n}"
+            },
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/rentals/a04dM00000YaPY3QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals",
+                "a04dM00000YaPY3QAN"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Rental",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SALESFORCE_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1/rentals/a04dM00000YaPY3QAN",
+              "protocol": "https",
+              "host": [
+                "stu2401322033",
+                "c9195e8f6294",
+                "develop",
+                "my",
+                "salesforce",
+                "com"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals",
+                "a04dM00000YaPY3QAN"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "SALESFORCE_TOKEN",
+      "value": "",
+      "type": "string",
+      "description": "OAuth 2.0 Bearer token from Salesforce. Get it from: sf org display | grep 'Access Token'"
+    }
+  ]
+}

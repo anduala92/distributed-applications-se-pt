@@ -1,0 +1,676 @@
+{
+  "info": {
+    "name": "Bike Shop REST API Collection",
+    "description": "Complete REST API collection for Bike Shop - Bikes, Customers, and Rentals management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com",
+      "type": "default"
+    },
+    {
+      "key": "apiVersion",
+      "value": "/services/apexrest",
+      "type": "default"
+    },
+    {
+      "key": "clientId",
+      "value": "",
+      "type": "default",
+      "description": "OAuth Consumer Key from Connected App"
+    },
+    {
+      "key": "clientSecret",
+      "value": "",
+      "type": "default",
+      "description": "OAuth Consumer Secret from Connected App"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "default",
+      "description": "Generated OAuth Access Token"
+    },
+    {
+      "key": "tokenUrl",
+      "value": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/oauth2/token",
+      "type": "default"
+    },
+    {
+      "key": "authorizationUrl",
+      "value": "https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/oauth2/authorize",
+      "type": "default"
+    },
+    {
+      "key": "bikeId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "rentalId",
+      "value": "",
+      "type": "default"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔑 OAUTH SETUP",
+      "item": [
+        {
+          "name": "Get OAuth Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{clientId}}"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{clientSecret}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{tokenUrl}}",
+              "host": [
+                "{{tokenUrl}}"
+              ]
+            },
+            "description": "Get OAuth access token using Client Credentials flow"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "BIKES API",
+      "item": [
+        {
+          "name": "Get All Bikes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/bikes?page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all bikes with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Bikes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/bikes?search=Trek&page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "Trek"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Search bikes by name, brand or model"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Bike",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"Trek Domane AL 5\",\n  \"Model__c\": \"Domane AL 5\",\n  \"Brand__c\": \"Trek\",\n  \"Category__c\": \"Road\",\n  \"Daily_Rate__c\": 55,\n  \"Available__c\": true,\n  \"Mileage__c\": 500,\n  \"Last_Service_Date__c\": \"2026-03-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/bikes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes"
+              ]
+            },
+            "description": "Create a new bike"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Bike",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Daily_Rate__c\": 65,\n  \"Available__c\": false,\n  \"Mileage__c\": 750\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/bikes/{{bikeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes",
+                "{{bikeId}}"
+              ]
+            },
+            "description": "Update a bike (partial update)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Bike",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/bikes/{{bikeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "bikes",
+                "{{bikeId}}"
+              ]
+            },
+            "description": "Delete a bike"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CUSTOMERS API",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/customers?page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all customers with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/customers?search=John&page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "John"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Search customers by name or email"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Name\": \"John Doe\",\n  \"First_Name__c\": \"John\",\n  \"Last_Name__c\": \"Doe\",\n  \"Email__c\": \"john.doe@example.com\",\n  \"Phone__c\": \"+359888123456\",\n  \"Is_Active__c\": true,\n  \"Loyalty_Points__c\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers"
+              ]
+            },
+            "description": "Create a new customer"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Phone__c\": \"+359888999999\",\n  \"Loyalty_Points__c\": 250,\n  \"Is_Active__c\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Update a customer (partial update)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/customers/{{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "description": "Delete a customer"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RENTALS API",
+      "item": [
+        {
+          "name": "Get All Rentals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/rentals?page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all rentals with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Active Rentals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/rentals?status=Active&page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Active"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get active rentals by status filter"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Rental",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Bike__c\": \"{{bikeId}}\",\n  \"Customer__c\": \"{{customerId}}\",\n  \"Start_Date__c\": \"2026-03-10\",\n  \"End_Date__c\": \"2026-03-15\",\n  \"Daily_Price__c\": 55,\n  \"Status__c\": \"Draft\",\n  \"Paid__c\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/rentals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals"
+              ]
+            },
+            "description": "Create a new rental"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Rental",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Status__c\": \"Active\",\n  \"Paid__c\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/rentals/{{rentalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals",
+                "{{rentalId}}"
+              ]
+            },
+            "description": "Update a rental (partial update)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Rental",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiVersion}}/bikeshop/v1/rentals/{{rentalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "apexrest",
+                "bikeshop",
+                "v1",
+                "rentals",
+                "{{rentalId}}"
+              ]
+            },
+            "description": "Delete a rental"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

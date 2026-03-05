@@ -1,0 +1,154 @@
+<template>
+    <lightning-card title="Bike Shop Management" icon-name="standard:product_request">
+        <div class="wrapper">
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error slds-m-bottom_small">{errorMessage}</div>
+            </template>
+
+            <!-- Bikes Tab -->
+            <lightning-tabset>
+                <lightning-tab label="Bikes">
+                    <div class="section">
+                        <div class="toolbar">
+                            <lightning-input
+                                type="search"
+                                label="Search bikes"
+                                placeholder="Enter bike name..."
+                                value={bikeSearch}
+                                data-search="bike"
+                                onchange={handleSearchChange}
+                            ></lightning-input>
+                            <!-- <lightning-button variant="brand" label="Search" onclick={loadBikes}></lightning-button> -->
+                            <lightning-button label="New" onclick={resetBikeForm}></lightning-button>
+                            <lightning-button variant="destructive" label="Delete selected" onclick={deleteBike}></lightning-button>
+                        </div>
+
+                        <lightning-datatable
+                            key-field="Id"
+                            data={bikes}
+                            columns={bikeColumns}
+                            onrowselection={handleBikeSelection}
+                        ></lightning-datatable>
+
+                        <div class="pager">Page {bikePage} / {bikeTotalPages} · Total {bikeTotal}</div>
+                        <div class="toolbar">
+                            <lightning-button label="Prev" onclick={prevBikePage}></lightning-button>
+                            <lightning-button label="Next" onclick={nextBikePage}></lightning-button>
+                        </div>
+
+                        <div class="form-grid">
+                            <lightning-input label="Id (for update)" value={bikeForm.Id} disabled></lightning-input>
+                            <lightning-input label="Name" value={bikeName} disabled></lightning-input>
+                            <lightning-input required label="Model" value={bikeForm.Model__c} data-entity="bike" data-field="Model__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input required label="Brand" value={bikeForm.Brand__c} data-entity="bike" data-field="Brand__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-combobox required label="Category" value={bikeForm.Category__c} options={bikeCategoryOptions} data-entity="bike" data-field="Category__c" onchange={handleFormInput}></lightning-combobox>
+                            <lightning-input required type="number" min="0.01" step="0.01" label="Daily Rate" value={bikeForm.Daily_Rate__c} data-entity="bike" data-field="Daily_Rate__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="number" label="Mileage" value={bikeForm.Mileage__c} data-entity="bike" data-field="Mileage__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="date" label="Last Service" value={bikeForm.Last_Service_Date__c} max={todayDate} data-entity="bike" data-field="Last_Service_Date__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="checkbox" label="Available" checked={bikeForm.Available__c} data-entity="bike" data-field="Available__c" onchange={handleFormCheckbox}></lightning-input>
+                        </div>
+                        <lightning-button variant="brand" label="Save Bike" onclick={saveBike}></lightning-button>
+                    </div>
+                </lightning-tab>
+
+                <!-- Customers Tab -->
+                <lightning-tab label="Customers">
+                    <div class="section">
+                        <div class="toolbar">
+                            <lightning-input
+                                type="search"
+                                label="Search customers"
+                                placeholder="Enter customer name..."
+                                value={customerSearch}
+                                data-search="customer"
+                                onchange={handleSearchChange}
+                            ></lightning-input>
+                            <!-- <lightning-button variant="brand" label="Search" onclick={loadCustomers}></lightning-button> -->
+                            <lightning-button label="New" onclick={resetCustomerForm}></lightning-button>
+                            <lightning-button variant="destructive" label="Delete selected" onclick={deleteCustomer}></lightning-button>
+                        </div>
+
+                        <lightning-datatable
+                            key-field="Id"
+                            data={customers}
+                            columns={customerColumns}
+                            onrowselection={handleCustomerSelection}
+                        ></lightning-datatable>
+
+                        <div class="pager">Page {customerPage} / {customerTotalPages} · Total {customerTotal}</div>
+                        <div class="toolbar">
+                            <lightning-button label="Prev" onclick={prevCustomerPage}></lightning-button>
+                            <lightning-button label="Next" onclick={nextCustomerPage}></lightning-button>
+                        </div>
+
+                        <div class="form-grid">
+                            <lightning-input label="Id (for update)" value={customerForm.Id} disabled></lightning-input>
+                            <lightning-input required label="First Name" value={customerForm.First_Name__c} data-entity="customer" data-field="First_Name__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input required label="Last Name" value={customerForm.Last_Name__c} data-entity="customer" data-field="Last_Name__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input required type="email" label="Email" value={customerForm.Email__c} data-entity="customer" data-field="Email__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="tel" label="Phone" value={customerForm.Phone__c} pattern="[\+]?[0-9]{10,15}" message-when-pattern-mismatch="Phone must be 10-15 digits, optionally starting with +" data-entity="customer" data-field="Phone__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="date" label="Birth Date" value={customerForm.Birth_Date__c} data-entity="customer" data-field="Birth_Date__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="number" label="Loyalty Points" value={customerForm.Loyalty_Points__c} data-entity="customer" data-field="Loyalty_Points__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="checkbox" label="Is Active" checked={customerForm.Is_Active__c} data-entity="customer" data-field="Is_Active__c" onchange={handleFormCheckbox}></lightning-input>
+                        </div>
+                        <lightning-button variant="brand" label="Save Customer" onclick={saveCustomer}></lightning-button>
+                    </div>
+                </lightning-tab>
+
+                <!-- Rentals Tab -->
+                <lightning-tab label="Rentals">
+                    <div class="section">
+                        <div class="toolbar">
+                            <lightning-input
+                                type="search"
+                                label="Search rentals"
+                                placeholder="Enter bike name, customer name, or rental number..."
+                                value={rentalSearch}
+                                data-search="rental"
+                                onchange={handleRentalSearchChange}
+                            ></lightning-input>
+                            <lightning-combobox
+                                label="Filter by status"
+                                value={rentalStatusFilter}
+                                options={statusFilterOptions}
+                                onchange={handleStatusFilterChange}
+                            ></lightning-combobox>
+                            <lightning-button label="New" onclick={resetRentalForm}></lightning-button>
+                            <lightning-button variant="destructive" label="Delete selected" onclick={deleteRental}></lightning-button>
+                        </div>
+
+                        <lightning-datatable
+                            key-field="Id"
+                            data={rentals}
+                            columns={rentalColumns}
+                            onrowselection={handleRentalSelection}
+                        ></lightning-datatable>
+
+                        <div class="pager">Page {rentalPage} / {rentalTotalPages} · Total {rentalTotal}</div>
+                        <div class="toolbar">
+                            <lightning-button label="Prev" onclick={prevRentalPage}></lightning-button>
+                            <lightning-button label="Next" onclick={nextRentalPage}></lightning-button>
+                        </div>
+
+                        <div class="form-grid">
+                            <lightning-input label="Id (for update)" value={rentalForm.Id} disabled></lightning-input>
+                            <lightning-combobox required label="Bike" value={rentalForm.Bike__c} options={bikeOptions} onchange={handleBikeChange}></lightning-combobox>
+                            <lightning-combobox required label="Customer" value={rentalForm.Customer__c} options={customerOptions} onchange={handleCustomerChange}></lightning-combobox>
+                            <lightning-input required type="date" label="Start Date" value={rentalForm.Start_Date__c} min={todayDate} data-entity="rental" data-field="Start_Date__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input required type="date" label="End Date" value={rentalForm.End_Date__c} min={rentalForm.Start_Date__c} data-entity="rental" data-field="End_Date__c" onchange={handleFormInput}></lightning-input>
+                            <lightning-input type="number" min="0.01" step="0.01" label="Daily Price" value={rentalForm.Daily_Price__c} disabled></lightning-input>
+                            <lightning-combobox required label="Status" value={rentalForm.Status__c} options={statusOptions} onchange={handleStatusChange}></lightning-combobox>
+                            <lightning-input type="checkbox" label="Paid" checked={rentalForm.Paid__c} data-entity="rental" data-field="Paid__c" onchange={handleFormCheckbox}></lightning-input>
+                            <div style="grid-column: span 2; padding: 10px; background-color: #f0f0f0; border-radius: 4px;">
+                                <div style="font-weight: bold; margin-bottom: 5px;">Rental Summary</div>
+                                <div>Days: {rentalTotalDays}</div>
+                                <div style="font-size: 18px; font-weight: bold; color: #06a5da;">Total: {rentalTotalAmount} $</div>
+                            </div>
+                        </div>
+                        <lightning-button variant="brand" label="Save Rental" onclick={saveRental}></lightning-button>
+                    </div>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Bike Shop application with custom Lightning page.</description>
+        <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <label>Bike Shop Application</label>
+    <navType>Standard</navType>
+    <tabs>standard-home</tabs>
+    <tabs>Bike_Shop_Page</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

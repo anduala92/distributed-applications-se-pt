@@ -1,0 +1,1362 @@
+openapi: 3.0.3
+info:
+  title: Bike Shop REST API
+  description: |
+    REST API за управление на мотоциклетите, клиентите и наемането в Bike Shop.
+    Приложението е реализирано в Salesforce с три основни ресурса.
+  version: 1.0.0
+  contact:
+    name: Aleksandar Aleksandrov
+    email: aleksander.aleksandrov923@gmail.com
+  license:
+    name: MIT
+
+servers:
+  - url: https://stu2401322033.c9195e8f6294.develop.my.salesforce.com/services/apexrest/bikeshop/v1
+    description: Salesforce Org - Development
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Bikes
+    description: Операции с мотоциклети
+  - name: Customers
+    description: Операции с клиенти
+  - name: Rentals
+    description: Операции с наемания
+
+paths:
+  /bikes:
+    get:
+      tags:
+        - Bikes
+      summary: Лист на всички мотоциклети
+      description: Получава пагинирана лист на всички мотоциклети със възможност за търсене и филтриране
+      operationId: getBikes
+      parameters:
+        - name: page
+          in: query
+          description: Номер на страницата (начало от 1)
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            example: 1
+        - name: pageSize
+          in: query
+          description: Брой записи на страница (макс 100)
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+            example: 10
+        - name: search
+          in: query
+          description: Търсене по име, модел или марка
+          schema:
+            type: string
+            example: "Honda"
+        - name: category
+          in: query
+          description: Филтър по категория
+          schema:
+            type: string
+            enum: [Mountain, Road, Cruiser, Hybrid]
+            example: "Mountain"
+        - name: available
+          in: query
+          description: Филтър по наличност
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Успешна операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BikeListResponse'
+              examples:
+                success:
+                  value:
+                    records:
+                      - id: "a02dM00000YaPY1QAN"
+                        name: "Mountain Bike Pro"
+                        model: "MTB-2024"
+                        brand: "Trek"
+                        category: "Mountain"
+                        dailyRate: 25.00
+                        available: true
+                        mileage: 150
+                        lastServiceDate: "2026-02-15"
+                    total: 5
+                    page: 1
+                    pageSize: 10
+        '400':
+          description: Невалидни параметри
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidPage:
+                  value:
+                    error: "Invalid page number. Page must be a positive integer."
+                    statusCode: 400
+                invalidPageSize:
+                  value:
+                    error: "Page size must be between 1 and 100."
+                    statusCode: 400
+        '401':
+          description: Отсътства или невалиден токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingToken:
+                  value:
+                    error: "Missing or invalid authentication token."
+                    statusCode: 401
+
+    post:
+      tags:
+        - Bikes
+      summary: Создание на нова мотоциклета
+      description: Създава нова мотоциклета в системата
+      operationId: createBike
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BikeInput'
+            examples:
+              createBike:
+                value:
+                  name: "City Bike"
+                  model: "CB-100"
+                  brand: "Giant"
+                  category: "Hybrid"
+                  dailyRate: 15.00
+                  available: true
+                  mileage: 0
+      responses:
+        '201':
+          description: Мотоциклета успешно създадена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BikeDto'
+              examples:
+                success:
+                  value:
+                    id: "a02dM00000YaPY1QAN"
+                    name: "Giant City Bike"
+                    model: "CB-100"
+                    brand: "Giant"
+                    category: "Hybrid"
+                    dailyRate: 15.00
+                    available: true
+                    mileage: 0
+                    lastServiceDate: null
+        '400':
+          description: Невалидни входни данни
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingModel:
+                  value:
+                    error: "Model is required and cannot be blank."
+                    statusCode: 400
+                missingBrand:
+                  value:
+                    error: "Brand is required and cannot be blank."
+                    statusCode: 400
+                negativeDailyRate:
+                  value:
+                    error: "Daily Rate cannot be negative."
+                    statusCode: 400
+        '401':
+          description: Отсътства или невалиден токен
+        '403':
+          description: Нямаш разрешение за създание
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noCreateAccess:
+                  value:
+                    error: "No create access to Bike."
+                    statusCode: 403
+
+  /bikes/{id}:
+    get:
+      tags:
+        - Bikes
+      summary: Получи мотоциклета по ID
+      description: Получава информация за конкретна мотоциклета
+      operationId: getBikeById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на мотоциклетата
+          schema:
+            type: string
+            example: "a02dM00000YaPY1QAN"
+      responses:
+        '200':
+          description: Успешна операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BikeDto'
+              examples:
+                success:
+                  value:
+                    id: "a02dM00000YaPY1QAN"
+                    name: "Mountain Bike Pro"
+                    model: "MTB-2024"
+                    brand: "Trek"
+                    category: "Mountain"
+                    dailyRate: 25.00
+                    available: true
+                    mileage: 150
+                    lastServiceDate: "2026-02-15"
+        '404':
+          description: Мотоциклета не намерена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Bike not found for ID a02dM00000Invalid."
+                    statusCode: 404
+        '401':
+          description: Отсътства или невалиден токен
+
+    patch:
+      tags:
+        - Bikes
+      summary: Обновяване на мотоциклета
+      description: Частично обновяване на данните на мотоциклетата
+      operationId: updateBike
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на мотоциклетата
+          schema:
+            type: string
+            example: "a02dM00000YaPY1QAN"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BikeInput'
+            examples:
+              updateBike:
+                value:
+                  dailyRate: 30.00
+                  mileage: 250
+      responses:
+        '200':
+          description: Мотоциклета успешно обновена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BikeDto'
+              examples:
+                success:
+                  value:
+                    id: "a02dM00000YaPY1QAN"
+                    name: "Mountain Bike Pro"
+                    model: "MTB-2024"
+                    brand: "Trek"
+                    category: "Mountain"
+                    dailyRate: 30.00
+                    available: true
+                    mileage: 250
+                    lastServiceDate: "2026-02-20"
+        '400':
+          description: Невалидни входни данни
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                negativeMileage:
+                  value:
+                    error: "Mileage cannot be negative."
+                    statusCode: 400
+        '404':
+          description: Мотоциклета не намерена
+        '401':
+          description: Отсътства или невалиден токен
+        '403':
+          description: Нямаш разрешение за обновяване
+
+    delete:
+      tags:
+        - Bikes
+      summary: Изтриване на мотоциклета
+      description: Премахва мотоциклета от системата
+      operationId: deleteBike
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на мотоциклетата
+          schema:
+            type: string
+            example: "a02dM00000YaPY1QAN"
+      responses:
+        '204':
+          description: Мотоциклета успешно изтрита
+        '404':
+          description: Мотоциклета не намерена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Bike not found for ID a02dM00000Invalid."
+                    statusCode: 404
+        '401':
+          description: Отсътства или невалиден токен
+        '403':
+          description: Нямаш разрешение за изтриване
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noDeletAccess:
+                  value:
+                    error: "No delete access to Bike."
+                    statusCode: 403
+
+  /customers:
+    get:
+      tags:
+        - Customers
+      summary: Лист на всички клиенти
+      description: Получава пагинирана лист на всички клиенти със възможност за търсене
+      operationId: getCustomers
+      parameters:
+        - name: page
+          in: query
+          description: Номер на страницата (начало от 1)
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            example: 1
+        - name: pageSize
+          in: query
+          description: Брой записи на страница (макс 100)
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+            example: 10
+        - name: search
+          in: query
+          description: Търсене по име или имейл
+          schema:
+            type: string
+            example: "Aleksandar"
+        - name: isActive
+          in: query
+          description: Филтър по активност
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Успешна операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerListResponse'
+              examples:
+                success:
+                  value:
+                    records:
+                      - id: "a03dM00000YaPY2QAN"
+                        name: "Aleksandar Aleksandrov"
+                        firstName: "Aleksandar"
+                        lastName: "Aleksandrov"
+                        email: "aleksander.aleksandrov923@gmail.com"
+                        phone: "0878955771"
+                        birthDate: null
+                        loyaltyPoints: 0
+                        isActive: true
+                      - id: "a03dM00000YaPY3QAN"
+                        name: "Ivan Petrov"
+                        firstName: "Ivan"
+                        lastName: "Petrov"
+                        email: "ivan.petrov@example.com"
+                        phone: "0888123456"
+                        birthDate: "1990-05-15"
+                        loyaltyPoints: 150
+                        isActive: true
+                    total: 2
+                    page: 1
+                    pageSize: 10
+        '400':
+          description: Невалидни параметри
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidPage:
+                  value:
+                    error: "Invalid page number. Page must be a positive integer."
+                    statusCode: 400
+        '401':
+          description: Отсътства или невалиден токен
+
+    post:
+      tags:
+        - Customers
+      summary: Създание на нов клиент
+      description: Създава нов клиент в системата
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+            examples:
+              createCustomer:
+                value:
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                  phone: "0888123456"
+                  birthDate: "1990-05-15"
+      responses:
+        '201':
+          description: Клиент успешно създаден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDto'
+              examples:
+                success:
+                  value:
+                    id: "a03dM00000YaPY2QAN"
+                    name: "John Doe"
+                    firstName: "John"
+                    lastName: "Doe"
+                    email: "john.doe@example.com"
+                    phone: "0888123456"
+                    birthDate: "1990-05-15"
+                    loyaltyPoints: 0
+                    isActive: true
+        '400':
+          description: Невалидни входни данни
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingFirstName:
+                  value:
+                    error: "First Name is required and cannot be blank."
+                    statusCode: 400
+                missingLastName:
+                  value:
+                    error: "Last Name is required and cannot be blank."
+                    statusCode: 400
+                missingEmail:
+                  value:
+                    error: "Email is required and cannot be blank."
+                    statusCode: 400
+                invalidPhoneFormat:
+                  value:
+                    error: "Phone number format is invalid. Use format like: +359 88 123 4567 or 0888123456"
+                    statusCode: 400
+        '401':
+          description: Отсътства или невалиден токен
+        '403':
+          description: Нямаш разрешение за създание
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noCreateAccess:
+                  value:
+                    error: "No create access to Customer."
+                    statusCode: 403
+
+  /customers/{id}:
+    get:
+      tags:
+        - Customers
+      summary: Получи клиента по ID
+      description: Получава информация за конкретен клиент
+      operationId: getCustomerById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на клиента
+          schema:
+            type: string
+            example: "a03dM00000YaPY2QAN"
+      responses:
+        '200':
+          description: Успешна операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDto'
+              examples:
+                success:
+                  value:
+                    id: "a03dM00000YaPY2QAN"
+                    name: "John Doe"
+                    firstName: "John"
+                    lastName: "Doe"
+                    email: "john.doe@example.com"
+                    phone: "0888123456"
+                    birthDate: "1990-05-15"
+                    loyaltyPoints: 0
+                    isActive: true
+        '404':
+          description: Клиента не намерен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Customer not found for ID a03dM00000Invalid."
+                    statusCode: 404
+        '401':
+          description: Отсътства или невалиден токен
+
+    patch:
+      tags:
+        - Customers
+      summary: Обновяване на клиента
+      description: Частично обновяване на данните на клиента
+      operationId: updateCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на клиента
+          schema:
+            type: string
+            example: "a03dM00000YaPY2QAN"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+            examples:
+              updateCustomer:
+                value:
+                  phone: "0888999999"
+                  loyaltyPoints: 100
+      responses:
+        '200':
+          description: Клиента успешно обновен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDto'
+              examples:
+                success:
+                  value:
+                    id: "a03dM00000YaPY2QAN"
+                    name: "John Doe"
+                    firstName: "John"
+                    lastName: "Doe"
+                    email: "john.doe@example.com"
+                    phone: "0888999999"
+                    birthDate: "1990-05-15"
+                    loyaltyPoints: 100
+                    isActive: true
+        '400':
+          description: Невалидни входни данни
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidPhoneFormat:
+                  value:
+                    error: "Phone number format is invalid. Use format like: +359 88 123 4567 or 0888123456"
+                    statusCode: 400
+        '404':
+          description: Клиента не намерен
+        '401':
+          description: Отсътства или невалиден токен
+
+    delete:
+      tags:
+        - Customers
+      summary: Изтриване на клиента
+      description: Премахва клиента от системата
+      operationId: deleteCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на клиента
+          schema:
+            type: string
+            example: "a03dM00000YaPY2QAN"
+      responses:
+        '204':
+          description: Клиента успешно изтрит
+        '404':
+          description: Клиента не намерен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Customer not found for ID a03dM00000Invalid."
+                    statusCode: 404
+        '401':
+          description: Отсътства или невалиден токен
+        '403':
+          description: Нямаш разрешение за изтриване
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noDeleteAccess:
+                  value:
+                    error: "No delete access to Customer."
+                    statusCode: 403
+
+  /rentals:
+    get:
+      tags:
+        - Rentals
+      summary: Лист на всички наемания
+      description: Получава пагинирана лист на всички наемания със възможност за филтриране
+      operationId: getRentals
+      parameters:
+        - name: page
+          in: query
+          description: Номер на страницата (начало от 1)
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            example: 1
+        - name: pageSize
+          in: query
+          description: Брой записи на страница (макс 100)
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+            example: 10
+        - name: status
+          in: query
+          description: Филтър по статус
+          schema:
+            type: string
+            enum: [Active, Completed, Cancelled]
+            example: "Active"
+        - name: paid
+          in: query
+          description: Филтър по платежен статус
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Успешна операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalListResponse'
+              examples:
+                success:
+                  value:
+                    records:
+                      - id: "a04dM00000YaPY3QAN"
+                        bikeId: "a02dM00000YaPY1QAN"
+                        bikeName: "Mountain Bike Pro"
+                        customerId: "a03dM00000YaPY2QAN"
+                        customerName: "Aleksandar Aleksandrov"
+                        startDate: "2026-03-01"
+                        endDate: "2026-03-05"
+                        dailyPrice: 25.00
+                        totalAmount: 100.00
+                        status: "Active"
+                        paid: false
+                      - id: "a04dM00000YaPY4QAN"
+                        bikeId: "a02dM00000YaPY2QAN"
+                        bikeName: "City Bike"
+                        customerId: "a03dM00000YaPY3QAN"
+                        customerName: "Ivan Petrov"
+                        startDate: "2026-03-10"
+                        endDate: "2026-03-12"
+                        dailyPrice: 15.00
+                        totalAmount: 30.00
+                        status: "Completed"
+                        paid: true
+                    total: 2
+                    page: 1
+                    pageSize: 10
+        '400':
+          description: Невалидни параметри
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidStatus:
+                  value:
+                    error: "Invalid status filter. Valid values are: Active, Completed, Cancelled"
+                    statusCode: 400
+        '401':
+          description: Отсътства или невалиден токен
+
+    post:
+      tags:
+        - Rentals
+      summary: Създание на ново наемание
+      description: Създава ново наемание в системата
+      operationId: createRental
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalInput'
+            examples:
+              createRental:
+                value:
+                  bikeId: "a02dM00000YaPY1QAN"
+                  customerId: "a03dM00000YaPY2QAN"
+                  startDate: "2026-03-10"
+                  endDate: "2026-03-15"
+      responses:
+        '201':
+          description: Наемание успешно създадено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDto'
+              examples:
+                success:
+                  value:
+                    id: "a04dM00000YaPY3QAN"
+                    bikeId: "a02dM00000YaPY1QAN"
+                    bikeName: "Mountain Bike Pro"
+                    customerId: "a03dM00000YaPY2QAN"
+                    customerName: "Aleksandar Aleksandrov"
+                    startDate: "2026-03-10"
+                    endDate: "2026-03-15"
+                    dailyPrice: 25.00
+                    totalAmount: 125.00
+                    status: "Active"
+                    paid: false
+        '400':
+          description: Невалидни входни данни
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingBike:
+                  value:
+                    error: "Bike is required and cannot be blank."
+                    statusCode: 400
+                missingCustomer:
+                  value:
+                    error: "Customer is required and cannot be blank."
+                    statusCode: 400
+                endDateBeforeStart:
+                  value:
+                    error: "End Date cannot be before Start Date."
+                    statusCode: 400
+                negativeDailyPrice:
+                  value:
+                    error: "Daily Price cannot be negative."
+                    statusCode: 400
+        '401':
+          description: Отсътства или невалиден токен
+        '403':
+          description: Нямаш разрешение за създание
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noCreateAccess:
+                  value:
+                    error: "No create access to Bike Rental."
+                    statusCode: 403
+
+  /rentals/{id}:
+    get:
+      tags:
+        - Rentals
+      summary: Получи наемането по ID
+      description: Получава информация за конкретно наемание
+      operationId: getRentalById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на наемането
+          schema:
+            type: string
+            example: "a04dM00000YaPY3QAN"
+      responses:
+        '200':
+          description: Успешна операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDto'
+              examples:
+                success:
+                  value:
+                    id: "a04dM00000YaPY3QAN"
+                    bikeId: "a02dM00000YaPY1QAN"
+                    bikeName: "Mountain Bike Pro"
+                    customerId: "a03dM00000YaPY2QAN"
+                    customerName: "Aleksandar Aleksandrov"
+                    startDate: "2026-03-01"
+                    endDate: "2026-03-05"
+                    dailyPrice: 25.00
+                    totalAmount: 100.00
+                    status: "Active"
+                    paid: false
+        '404':
+          description: Наемането не намерено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Rental not found for ID a04dM00000Invalid."
+                    statusCode: 404
+        '401':
+          description: Отсътства или невалиден токен
+
+    patch:
+      tags:
+        - Rentals
+      summary: Обновяване на наемането
+      description: Частично обновяване на данните на наемането (статус, платежно състояние)
+      operationId: updateRental
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на наемането
+          schema:
+            type: string
+            example: "a04dM00000YaPY3QAN"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalInput'
+            examples:
+              updateRental:
+                value:
+                  status: "Completed"
+                  paid: true
+      responses:
+        '200':
+          description: Наемание успешно обновено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDto'
+              examples:
+                success:
+                  value:
+                    id: "a04dM00000YaPY3QAN"
+                    bikeId: "a02dM00000YaPY1QAN"
+                    bikeName: "Mountain Bike Pro"
+                    customerId: "a03dM00000YaPY2QAN"
+                    customerName: "Aleksandar Aleksandrov"
+                    startDate: "2026-03-01"
+                    endDate: "2026-03-05"
+                    dailyPrice: 25.00
+                    totalAmount: 100.00
+                    status: "Completed"
+                    paid: true
+        '400':
+          description: Невалидни входни данни
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidStatus:
+                  value:
+                    error: "Invalid status. Valid values are: Active, Completed, Cancelled"
+                    statusCode: 400
+        '404':
+          description: Наемането не намерено
+        '401':
+          description: Отсътства или невалиден токен
+
+    delete:
+      tags:
+        - Rentals
+      summary: Изтриване на наемането
+      description: Премахва наемането от системата
+      operationId: deleteRental
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID на наемането
+          schema:
+            type: string
+            example: "a04dM00000YaPY3QAN"
+      responses:
+        '204':
+          description: Наемание успешно изтрито
+        '404':
+          description: Наемането не намерено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: "Rental not found for ID a04dM00000Invalid."
+                    statusCode: 404
+        '401':
+          description: Отсътства или невалиден токен
+        '403':
+          description: Нямаш разрешение за изтриване
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noDeleteAccess:
+                  value:
+                    error: "No delete access to Bike Rental."
+                    statusCode: 403
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth 2.0 Bearer token от Salesforce
+
+  schemas:
+    BikeDto:
+      type: object
+      required:
+        - id
+        - name
+        - model
+        - brand
+        - category
+        - dailyRate
+      properties:
+        id:
+          type: string
+          description: Уникален идентификатор на мотоциклетата
+          example: "a02dM00000YaPY1QAN"
+        name:
+          type: string
+          maxLength: 255
+          description: Име на мотоциклетата
+          example: "Mountain Bike Pro"
+        model:
+          type: string
+          maxLength: 255
+          description: Модел на мотоциклетата
+          example: "MTB-2024"
+        brand:
+          type: string
+          maxLength: 255
+          description: Марка на мотоциклетата
+          example: "Trek"
+        category:
+          type: string
+          enum: [Mountain, Road, Cruiser, Hybrid]
+          description: Категория
+          example: "Mountain"
+        dailyRate:
+          type: number
+          format: double
+          minimum: 0
+          description: Дневна такса за наемане
+          example: 25.00
+        available:
+          type: boolean
+          description: Дали мотоциклетата е налична за наемане
+          example: true
+        mileage:
+          type: number
+          format: double
+          minimum: 0
+          description: Пробег на мотоциклетата в км
+          example: 150
+        lastServiceDate:
+          type: string
+          format: date
+          nullable: true
+          description: Дата на последното обслужване
+          example: "2026-02-15"
+
+    BikeInput:
+      type: object
+      required:
+        - name
+        - model
+        - brand
+        - category
+        - dailyRate
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          description: Име на мотоциклетата
+          example: "City Bike"
+        model:
+          type: string
+          maxLength: 255
+          description: Модел
+          example: "CB-100"
+        brand:
+          type: string
+          maxLength: 255
+          description: Марка
+          example: "Giant"
+        category:
+          type: string
+          enum: [Mountain, Road, Cruiser, Hybrid]
+          description: Категория
+          example: "Hybrid"
+        dailyRate:
+          type: number
+          format: double
+          minimum: 0
+          description: Дневна такса
+          example: 15.00
+        available:
+          type: boolean
+          description: Наличност
+          example: true
+        mileage:
+          type: number
+          format: double
+          minimum: 0
+          description: Пробег
+          example: 0
+        lastServiceDate:
+          type: string
+          format: date
+          nullable: true
+          description: Дата на обслужване
+          example: null
+
+    BikeListResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/BikeDto'
+        total:
+          type: integer
+          description: Общо брой записи
+          example: 5
+        page:
+          type: integer
+          description: Текущ номер на страница
+          example: 1
+        pageSize:
+          type: integer
+          description: Брой записи на страница
+          example: 10
+
+    CustomerDto:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+          description: Уникален идентификатор на клиента
+          example: "a03dM00000YaPY2QAN"
+        name:
+          type: string
+          maxLength: 255
+          description: Пълно име на клиента
+          example: "Aleksandar Aleksandrov"
+        firstName:
+          type: string
+          maxLength: 255
+          description: Първо име
+          example: "Aleksandar"
+        lastName:
+          type: string
+          maxLength: 255
+          description: Фамилия
+          example: "Aleksandrov"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: Имейл адрес
+          example: "aleksander.aleksandrov923@gmail.com"
+        phone:
+          type: string
+          maxLength: 20
+          pattern: '^\+?[0-9\s\-\(\)]+$'
+          description: Телефонен номер (формат е проверен)
+          example: "0878955771"
+        birthDate:
+          type: string
+          format: date
+          nullable: true
+          description: Дата на раждане
+          example: null
+        loyaltyPoints:
+          type: integer
+          minimum: 0
+          description: Брой точки за лояност
+          example: 0
+        isActive:
+          type: boolean
+          description: Активен ли е клиентът
+          example: true
+
+    CustomerInput:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+      properties:
+        firstName:
+          type: string
+          maxLength: 255
+          description: Първо име
+          example: "John"
+        lastName:
+          type: string
+          maxLength: 255
+          description: Фамилия
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: Имейл адрес
+          example: "john.doe@example.com"
+        phone:
+          type: string
+          maxLength: 20
+          pattern: '^\+?[0-9\s\-\(\)]+$'
+          description: Телефонен номер (формат е проверен на сервъра)
+          example: "0888123456"
+        birthDate:
+          type: string
+          format: date
+          nullable: true
+          description: Дата на раждане
+          example: "1990-05-15"
+        loyaltyPoints:
+          type: integer
+          minimum: 0
+          description: Начални точки за лояност
+          example: 0
+        isActive:
+          type: boolean
+          description: Активност на клиента
+          example: true
+
+    CustomerListResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerDto'
+        total:
+          type: integer
+          description: Общо брой записи
+          example: 1
+        page:
+          type: integer
+          description: Текущ номер на страница
+          example: 1
+        pageSize:
+          type: integer
+          description: Брой записи на страница
+          example: 10
+
+    RentalDto:
+      type: object
+      required:
+        - id
+        - bikeId
+        - customerId
+        - startDate
+        - endDate
+      properties:
+        id:
+          type: string
+          description: Уникален идентификатор на наемането
+          example: "a04dM00000YaPY3QAN"
+        bikeId:
+          type: string
+          description: ID на наетата мотоциклета
+          example: "a02dM00000YaPY1QAN"
+        bikeName:
+          type: string
+          description: Име на наетата мотоциклета
+          example: "Mountain Bike Pro"
+        customerId:
+          type: string
+          description: ID на клиента
+          example: "a03dM00000YaPY2QAN"
+        customerName:
+          type: string
+          description: Име на клиента
+          example: "Aleksandar Aleksandrov"
+        startDate:
+          type: string
+          format: date
+          description: Дата на начало на наемането
+          example: "2026-03-01"
+        endDate:
+          type: string
+          format: date
+          description: Дата на край на наемането
+          example: "2026-03-05"
+        dailyPrice:
+          type: number
+          format: double
+          minimum: 0
+          description: Дневна цена на наемането
+          example: 25.00
+        totalAmount:
+          type: number
+          format: double
+          minimum: 0
+          description: Обща сума за наемането
+          example: 100.00
+        status:
+          type: string
+          enum: [Active, Completed, Cancelled]
+          description: Статус на наемането
+          example: "Active"
+        paid:
+          type: boolean
+          description: Дали наемането е платено
+          example: false
+
+    RentalInput:
+      type: object
+      required:
+        - bikeId
+        - customerId
+        - startDate
+        - endDate
+      properties:
+        bikeId:
+          type: string
+          description: ID на мотоциклетата
+          example: "a02dM00000YaPY1QAN"
+        customerId:
+          type: string
+          description: ID на клиента
+          example: "a03dM00000YaPY2QAN"
+        startDate:
+          type: string
+          format: date
+          description: Дата на начало
+          example: "2026-03-10"
+        endDate:
+          type: string
+          format: date
+          description: Дата на край
+          example: "2026-03-15"
+        status:
+          type: string
+          enum: [Active, Completed, Cancelled]
+          description: Статус
+          example: "Active"
+        paid:
+          type: boolean
+          description: Платежен статус
+          example: false
+
+    RentalListResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalDto'
+        total:
+          type: integer
+          description: Общо брой записи
+          example: 1
+        page:
+          type: integer
+          description: Текущ номер на страница
+          example: 1
+        pageSize:
+          type: integer
+          description: Брой записи на страница
+          example: 10
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Описание на грешката
+          example: "Model is required and cannot be blank."
+        statusCode:
+          type: integer
+          description: HTTP статус код
+          example: 400

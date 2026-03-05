@@ -1,0 +1,26 @@
+.wrapper {
+    padding: 0.75rem;
+}
+
+.section {
+    padding: 0.75rem 0;
+}
+
+.toolbar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: end;
+    margin: 0.5rem 0;
+}
+
+.pager {
+    margin: 0.5rem 0;
+    font-weight: 600;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
